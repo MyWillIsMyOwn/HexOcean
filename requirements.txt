@@ -1,0 +1,7 @@
+Django==4.1.7
+Pillow==9.4.0
+psycopg2==2.9.5
+django-imagekit==4.1.0
+djangorestframework==3.14.0
+easy-thumbnails==2.8.5
+python-magic==0.4.27

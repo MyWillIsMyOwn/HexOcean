@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from .serializers import UserSerializer, GroupSerializer, ImageSerializer
-from .models import Image
+from .models import Image, Account
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
@@ -30,6 +30,11 @@ class GroupViewSet(viewsets.ModelViewSet):
 class ImageList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ImageSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["account_type"] = Account.objects.get(user=self.request.user)
+        return context
 
     def get_queryset(self):
         return Image.objects.filter(owner=self.request.user)
