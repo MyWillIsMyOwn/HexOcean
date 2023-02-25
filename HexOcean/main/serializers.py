@@ -1,15 +1,10 @@
 from django.conf import settings
-from django.contrib.auth.models import User, Group
-import requests, os
 from rest_framework import serializers, reverse
-from .models import Image, Account, Tier
-from PIL import Image as PILImage
-from io import BytesIO
-from urllib.parse import urljoin
+from .models import Image, Account
 from imagekit.processors import ResizeToFill
 from imagekit import ImageSpec
 
-# from django.urls import reverse
+
 class Thumbnail(ImageSpec):
     format = "JPEG"
     options = {"quality": 90}
@@ -19,27 +14,9 @@ class Thumbnail(ImageSpec):
         self.processors = [ResizeToFill(height=height, width=width)]
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ["url", "username", "email", "groups"]
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ["url", "name"]
-
-
 class ImageSerializer(serializers.HyperlinkedModelSerializer):
-    # small_thumbnail = serializers.ImageField(read_only=True)
-    # middle_thubmnail = serializers.ImageField(read_only=True)
     original_thubmnail = serializers.ImageField(read_only=True)
-    user_account_type = serializers.CharField(
-        source="owner.accounts.first.account_type", read_only=True
-    )
     binary = serializers.SerializerMethodField()
-    # custom_tier = serializers.SerializerMethodField()
 
     class Meta:
         model = Image
@@ -48,7 +25,6 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "original_thubmnail",
             "binary",
-            "user_account_type",
         ]
 
     def get_custom_tier(self, obj):

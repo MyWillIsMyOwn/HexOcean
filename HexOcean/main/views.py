@@ -1,19 +1,16 @@
 from datetime import datetime, timedelta
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.views import View
 import requests
-from .serializers import UserSerializer, GroupSerializer, ImageSerializer
-from .models import Image, Tier, Account
-from rest_framework import generics, permissions, status, viewsets
+from .serializers import ImageSerializer
+from .models import Image, Tier
+from rest_framework import generics, permissions, status
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 import magic, base64, os
 from django.http import HttpResponse
-from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-from django.core.files.images import ImageFile
 from django.conf import settings
-from PIL import Image as pilImage
 from imagekit import ImageSpec
 
 
@@ -22,9 +19,7 @@ class ImageView(View):
         url = kwargs.get("url")
         response = requests.get(url)
         image_content = response.content
-        return HttpResponse(
-            image_content, content_type="image/jpeg"
-        )  # tutaj możesz zmienić content_type na odpowiedni dla Twojego obrazka
+        return HttpResponse(image_content, content_type="image/jpeg")
 
 
 class Thumbnail(ImageSpec):
@@ -34,26 +29,6 @@ class Thumbnail(ImageSpec):
     def __init__(self, height, width, *args, **kwargs):
         super(type(self), self).__init__(*args, **kwargs)
         self.processors = [ResizeToFill(height=height, width=width)]
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-
-    queryset = User.objects.all().order_by("-date_joined")
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class ImageList(generics.ListAPIView):
@@ -89,14 +64,12 @@ class ImageUpload(generics.CreateAPIView):
             name=str(uploaded_photo),
             binary_image=base64.b64encode((request.FILES["file"]).read()),
         )
-        print("//////////////////", image_object.picture.path)
         image_object.save()
         list_of_custom_tiers = Tier.objects.all()
         create_dirs(list_of_custom_tiers)
         thumbnails_data = generate_thumbnail(list_of_custom_tiers, image_object)
         image_object.thumbnails_data = thumbnails_data
         image_object.save()
-        print("------------------------")
         serializer = ImageSerializer(image_object)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -110,10 +83,6 @@ def index(request, id):
     if current_time > link_date_expiration:
         return HttpResponse("<h1>Link has expired</h1>")
     return HttpResponse(f"{(image.binary_image)}")
-
-
-def thumbnail(request):
-    return HttpResponse
 
 
 def create_dirs(tiers):
@@ -169,5 +138,4 @@ def generate_thumbnail(tiers, picture):
                     "data": {"size": thumbnails["name"], "url": path},
                 }
             )
-    print(list_of_sizes_and_url)
     return list_of_sizes_and_url
