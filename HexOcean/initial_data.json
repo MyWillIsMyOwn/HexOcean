@@ -1,0 +1,46 @@
+[
+    {
+        "model": "main.tier",
+        "pk": 1,
+        "fields": {
+            "name": "Basic",
+            "thumbnails": {
+                "thumbnails": [
+                    {"name": "small", "size": 200}
+                ],
+                "original_link_enabled": false,
+                "expiring_links_enabled": false
+            }
+        }
+    },
+    {
+        "model": "main.tier",
+        "pk": 2,
+        "fields": {
+            "name": "Premium",
+            "thumbnails": {
+                "thumbnails": [
+                    {"name": "small", "size": 200},
+                    {"name": "big", "size": 400}
+                ],
+                "original_link_enabled": true,
+                "expiring_links_enabled": false
+            }
+        }
+    },
+    {
+        "model": "main.tier",
+        "pk": 3,
+        "fields": {
+            "name": "Enterprise",
+            "thumbnails": {
+                "thumbnails": [
+                    {"name": "small", "size": 200},
+                    {"name": "big", "size": 400}
+                ],
+                "original_link_enabled": true,
+                "expiring_links_enabled": true
+            }
+        }
+    }
+]

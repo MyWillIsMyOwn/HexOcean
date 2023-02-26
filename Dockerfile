@@ -1,16 +1,35 @@
+# Base image
 FROM python:3.11-alpine
 
-RUN mkdir /app
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-WORKDIR /app
+# Set the working directory in the container
+WORKDIR /code
 
+# Install system dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    build-base \
+    gcc \
+    libc-dev \
+    linux-headers \
+    postgresql-dev \
+    && apk add --no-cache \
+    postgresql-client \
+    curl
+
+
+
+# Install Python dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-RUN \
-apk add --no-cache python3 postgresql-libs && \
-apk add --no-cache --virtual .build-deps gcc python3-dev musl-dev postgresql-dev && \
-libmagic && \
-pip install -r requirements.txt 
-COPY . .
+# Copy the code into the container
+COPY . /code/
+WORKDIR /code/HexOcean
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# Expose the port
+EXPOSE 8000
+

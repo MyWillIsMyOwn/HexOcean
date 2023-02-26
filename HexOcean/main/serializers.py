@@ -43,6 +43,7 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
         get_user_tier_data = get_user_tier.tier.thumbnails
         tier_name = get_user_tier.tier.name
         request = self.context.get("request")
+        print(request)
         if not get_user_tier_data["original_link_enabled"]:
             del representation["original_thubmnail"]
         if not get_user_tier_data["expiring_links_enabled"]:
@@ -59,9 +60,11 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
             for item in new_list:
                 if item["size"] == field["name"]:
                     url = item["url"]
-                    full_url = request.build_absolute_uri(url)
-                    full_url = full_url.replace(str(settings.BASE_DIR), "")
-                    representation[field["name"]] = full_url
+                    print(url)
+                    if request:
+                        url = url.replace(str(settings.BASE_DIR), "")
+                        full_url = request.build_absolute_uri(url)
+                        representation[field["name"]] = full_url
         return representation
 
     def get_binary(self, obj):
