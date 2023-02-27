@@ -43,7 +43,6 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
         get_user_tier_data = get_user_tier.tier.thumbnails
         tier_name = get_user_tier.tier.name
         request = self.context.get("request")
-        print(request)
         if not get_user_tier_data["original_link_enabled"]:
             del representation["original_thubmnail"]
         if not get_user_tier_data["expiring_links_enabled"]:

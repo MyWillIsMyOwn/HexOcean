@@ -71,8 +71,6 @@ class ImageUpload(generics.CreateAPIView):
         thumbnails_data = generate_thumbnail(list_of_custom_tiers, image_object)
         image_object.thumbnails_data = thumbnails_data
         image_object.save()
-        print(image_object)
-        # time.sleep(1)
         serializer = ImageSerializer(image_object)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
